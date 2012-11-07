@@ -1,9 +1,16 @@
 See this:
 
+python gstreamer reference manual:
+http://pygstdocs.berlios.de/pygst-reference/
+
 gstreamer manual:
 http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/
 
 http://wiki.pitivi.org/wiki/PyGST_Tutorial/Elements%3a_basics
+http://wiki.pitivi.org/wiki/Elements_basics.py
+
+extending BaseTransform:
+https://dcc.ligo.org/public/0025/G1001050/004/sliding_max.py
 
 https://core.fluendo.com/gstreamer/svn/trunk/gst-fluendo-gdlsink/test/ismdplay.py
 good work being done here in mediagoblin:

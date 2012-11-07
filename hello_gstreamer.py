@@ -8,6 +8,72 @@ import gst
 
 default_file = '/home/jason/Oregon_Painting_Society_2011-04-08.avi'
 
+
+class CustomElement(gst.Element):
+    """ A basic, buffer forwarding gstreamer element """
+
+    #here we register our plugin details
+    __gstdetails__ = (
+        "CustomElement plugin",
+        "CustomElement",
+        "First attempt, stolen from elsewhere.", 
+        "no@body.com")
+    
+    #source pad (template): we send buffers forward through here
+    _srctemplate = gst.PadTemplate ('src',
+        gst.PAD_SRC,
+        gst.PAD_ALWAYS,
+        gst.caps_new_any())
+
+    #sink pad (template): we recieve buffers from our sink pad
+    _sinktemplate = gst.PadTemplate ('sink',
+        gst.PAD_SINK,
+        gst.PAD_ALWAYS,
+        gst.caps_new_any())
+    
+    #register our pad templates
+    __gsttemplates__ = (_srctemplate, _sinktemplate)
+
+    def __init__(self, *args, **kwargs):   
+        #initialise parent class
+        gst.Element.__init__(self, *args, **kwargs)
+        
+        #source pad, outgoing data
+        self.srcpad = gst.Pad(self._srctemplate)
+        
+        #sink pad, incoming data
+        self.sinkpad = gst.Pad(self._sinktemplate)
+        self.sinkpad.set_setcaps_function(self._sink_setcaps)
+        self.sinkpad.set_chain_function(self._sink_chain)
+        
+        #make pads available
+        self.add_pad(self.srcpad)
+        self.add_pad(self.sinkpad)
+    
+    def _sink_setcaps(self, pad, caps):
+        #we negotiate our capabilities here, this function is called
+        #as autovideosink accepts anything, we just say yes we can handle the
+        #incoming data
+        return True
+    
+    def _sink_chain(self, pad, buf):
+        #this is where we do filtering
+        #and then push a buffer to the next element, returning a value saying it was either successful or not.
+		print "Here........FILTERING!!!...........(len=%d,buf=%s)" %(len(buf),buf)
+		return self.srcpad.push(buf)
+		#out = []
+		#for i in range(len(buf)):
+		#	if(i % 5000 == 0):
+		#		#print "this guy %d," %(ord(buf[i][0]))
+		#		out.append(chr(0))
+		#	else:
+		#		out.append(buf[i])
+		#return self.srcpad.push(buf)
+		#return self.srcpad.push(''.join(out))
+
+#here we register our class with glib, the c-based object system used by gstreamer
+gobject.type_register(CustomElement)
+
 class CustomPlayer(object):
 	def __init__(self, message_callback, sync_message_callback):
 		self.player = gst.element_factory_make("playbin2", "player")
@@ -23,10 +89,14 @@ class CustomPlayer(object):
 		pad = timeoverlay.get_pad("video_sink")
 		ghostpad = gst.GhostPad("sink", pad)
 		my_bin.add_pad(ghostpad)
+
+		custom = CustomElement()
+		my_bin.add(custom)
+
 		autovideosink = gst.element_factory_make("autovideosink")
 		my_bin.add(autovideosink)
 
-		gst.element_link_many(timeoverlay, autovideosink)
+		gst.element_link_many(timeoverlay, custom, autovideosink)
 		self.player.set_property("video-sink", my_bin)
 
 		self.message_callback = message_callback
@@ -73,9 +143,7 @@ class GtkMain:
 		self.movie_window = gtk.DrawingArea()
 		vbox.add(self.movie_window)
 		window.show_all()
-
 		self.player = CustomPlayer(self.on_message, self.on_sync_message)
-		
 		
 	def start_stop(self, w):
 		if self.button.get_label() == "Start":
