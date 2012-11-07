@@ -3,5 +3,9 @@ See this:
 gstreamer manual:
 http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/
 
+http://wiki.pitivi.org/wiki/PyGST_Tutorial/Elements%3a_basics
+
 https://core.fluendo.com/gstreamer/svn/trunk/gst-fluendo-gdlsink/test/ismdplay.py
+good work being done here in mediagoblin:
+https://github.com/jwandborg/mediagoblin/blob/video_gstreamer-only/mediagoblin/media_types/video/transcoders.py#L53
 
