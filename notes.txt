@@ -1,4 +1,7 @@
 See this:
 
+gstreamer manual:
+http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/
+
 https://core.fluendo.com/gstreamer/svn/trunk/gst-fluendo-gdlsink/test/ismdplay.py
 
