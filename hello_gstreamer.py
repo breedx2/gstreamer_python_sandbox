@@ -17,17 +17,17 @@ class CustomPlayer(object):
 		bus.connect("message", self._on_message)
 		bus.connect("sync-message::element", self._on_sync_message)
 
-		bin = gst.Bin("my-bin")
+		my_bin = gst.Bin("my-bin")
 		timeoverlay = gst.element_factory_make("timeoverlay")
-		bin.add(timeoverlay)
+		my_bin.add(timeoverlay)
 		pad = timeoverlay.get_pad("video_sink")
 		ghostpad = gst.GhostPad("sink", pad)
-		bin.add_pad(ghostpad)
+		my_bin.add_pad(ghostpad)
 		autovideosink = gst.element_factory_make("autovideosink")
-		bin.add(autovideosink)
+		my_bin.add(autovideosink)
 
 		gst.element_link_many(timeoverlay, autovideosink)
-		self.player.set_property("video-sink", bin)
+		self.player.set_property("video-sink", my_bin)
 
 		self.message_callback = message_callback
 		self.sync_message_callback = sync_message_callback
