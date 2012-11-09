@@ -5,6 +5,7 @@ import pygtk, gtk, gobject
 import pygst
 pygst.require("0.10")
 import gst
+import Image
 
 default_file = '/home/jason/Oregon_Painting_Society_2011-04-08.avi'
 
@@ -59,7 +60,8 @@ class CustomElement(gst.Element):
     def _sink_chain(self, pad, buf):
         #this is where we do filtering
         #and then push a buffer to the next element, returning a value saying it was either successful or not.
-		print "Here........FILTERING!!!...........(len=%d,buf=%s)" %(len(buf),buf)
+		#img = Image.fromstring('RGB', [640,480], buf)	# This doesn't work because I think it's only half an image (interlaced?)
+		print "Here........FILTERING!!!...........(len=%d,buf=%s)" %(len(buf),buf.__class__.__name__)
 		return self.srcpad.push(buf)
 		#out = []
 		#for i in range(len(buf)):
@@ -83,20 +85,21 @@ class CustomPlayer(object):
 		bus.connect("message", self._on_message)
 		bus.connect("sync-message::element", self._on_sync_message)
 
-		my_bin = gst.Bin("my-bin")
 		timeoverlay = gst.element_factory_make("timeoverlay")
-		my_bin.add(timeoverlay)
-		pad = timeoverlay.get_pad("video_sink")
-		ghostpad = gst.GhostPad("sink", pad)
-		my_bin.add_pad(ghostpad)
-
+		colorspace = gst.element_factory_make('ffmpegcolorspace', 'color_pis')
 		custom = CustomElement()
-		my_bin.add(custom)
-
 		autovideosink = gst.element_factory_make("autovideosink")
-		my_bin.add(autovideosink)
 
-		gst.element_link_many(timeoverlay, custom, autovideosink)
+		my_bin = gst.Bin("my-bin")
+		my_bin.add(timeoverlay, colorspace, custom, autovideosink)
+		gst.element_link_many(timeoverlay, colorspace, custom, autovideosink)
+
+		timeoverlay_video_sink_pad = timeoverlay.get_pad("video_sink")
+		ghostpad_sink = gst.GhostPad("sink", timeoverlay_video_sink_pad)
+		my_bin.add_pad(ghostpad_sink)
+
+
+		# Because playbin2 is a pipeline, we set our bin as the video sink
 		self.player.set_property("video-sink", my_bin)
 
 		self.message_callback = message_callback

@@ -9,6 +9,12 @@ http://gstreamer.freedesktop.org/data/doc/gstreamer/head/manual/html/
 http://wiki.pitivi.org/wiki/PyGST_Tutorial/Elements%3a_basics
 http://wiki.pitivi.org/wiki/Elements_basics.py
 
+http://wiki.oz9aec.net/index.php/Gstreamer_cheat_sheet
+http://opencircuit.googlecode.com/svn-history/r10/trunk/bins/imagesink.py
+
+this patch shows how to write a file:
+https://www.redhat.com/archives/autotest-kernel/2012-August/msg00242.html
+
 extending BaseTransform:
 https://dcc.ligo.org/public/0025/G1001050/004/sliding_max.py
 
